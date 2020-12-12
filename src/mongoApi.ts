@@ -34,25 +34,23 @@ export async function getData(index) {
     try {
         const client = await mongoClient.connect();
         const db = client.db("moldb")
-        // db.collection(index).find({
 
-        // }, async (err, _result) => {
-        //     if (err) {
-        //         console.error(err)
-        //         return
-        //     }
-        //     console.log(index)
-        //     console.log(_result.ops)
-        //     resolve( _result.ops)
 
-        // });
+        const rs = await db.collection('moldb').find({
+            _id: index
 
-        const rs = await db.collection('tester').find({
+        }).toArray((err, _result) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+            console.log(index)
+            console.log(_result)
+            resolve([index, ..._result])
 
         });
-        console.log(rs)
-        
-        
+
+
     } catch (e) {
         console.error(e);
     } finally {
@@ -62,17 +60,24 @@ export async function getData(index) {
 }
 
 export async function insertData(body) {
-    let result;
+    let resolve, reject
+    let result = new Promise((r, rj) => { resolve = r; reject = rj });
     try {
         const client = await mongoClient.connect();
         const db = client.db("moldb")
-        const collection = await db.createCollection(body[0]);
-        collection.insertOne(body[1], function (err, result) {
+        const collection = await db.collection('moldb');
+        const data = { _id: body[0], ...body[1] };
+        collection.updateOne({ _id: body[0] }, { $set: data }, { upsert: true }, async function (err, result) {
             if (err) {
                 console.log(err)
+                reject(err)
+                return
             }
-            publisher.publish('moldb', JSON.stringify(result.ops))
-            mongoClient.close();
+            
+            const doc = await getData(body[0]) 
+            publisher.publish('moldb', JSON.stringify(doc) )
+            resolve(doc)
+            // mongoClient.close();
         })
     } catch (e) {
         console.error(e);
