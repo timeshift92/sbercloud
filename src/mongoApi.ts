@@ -2,9 +2,9 @@ import { MongoClient } from "mongodb";
 import * as redis from "redis";
 import { promisify } from "util";
 const mongoClient = new MongoClient("mongodb://rwuser:T7z-75F-34m-rGC@192.168.0.69:8635,192.168.0.106:8635,192.168.0.214:8635,192.168.0.100:8635,192.168.0.11:8635,192.168.0.216:8635,192.168.0.125:8635,192.168.0.5:8635,192.168.0.114:8635,192.168.0.132:8635/test?authSource=admin", {
-    maxPoolSize:500,
+    maxPoolSize: 500,
     useNewUrlParser: true,
-    useUnifiedTopology:true
+    useUnifiedTopology: true
 
 });
 const publisher = redis.createClient({
@@ -12,13 +12,16 @@ const publisher = redis.createClient({
     host: "192.168.0.111",
 });
 
-
+let client;
+mongoClient.connect().then(cl => {
+    client = cl;
+})
 
 export async function getData(index) {
     let resolve, reject
     let result = new Promise((r, rj) => { resolve = r; reject = rj });
     try {
-        const client = await mongoClient.connect();
+
         const db = client.db("moldb")
         const rs = await db.collection('moldb').find({
             _id: index
@@ -44,7 +47,7 @@ export async function insertData(body) {
     let resolve, reject
     let result = new Promise((r, rj) => { resolve = r; reject = rj });
     try {
-        const client = await mongoClient.connect();
+
         
         const db = client.db("moldb")
         const collection = await db.collection('moldb');
@@ -58,9 +61,8 @@ export async function insertData(body) {
             }
 
             const doc = await getData(body[0])
-            publisher.publish('moldb', JSON.stringify(doc))
+            publisher.publish('moldb', JSON.stringify({ data: [body[0], { _id: body[0], ...body[1] }], method: 'POST' }))
             resolve(doc)
-            client.close();
         })
     } catch (e) {
         console.error(e);

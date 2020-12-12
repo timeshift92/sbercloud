@@ -10,14 +10,14 @@ import { getData, insertData } from "./mongoApi";
 export async function applicationController(body: [string, object | null]) {
     const getAsync = promisify(rds.get).bind(rds);
     if (body.length <= 1 || (body.length > 1 && body[1] == null)) {
-        const redis:any = await getData(body[0]);       
-        return   JSON.parse(await getAsync(body[0]))
+        const mongo: any = await getData(body[0]);
+        return { method: "GET", data: mongo || JSON.parse(await getAsync(body[0])) }
         // return ;
     } else if (body.length > 1) {
-        rds.set(body[0], JSON.stringify([body[0],{ _id: body[0], ...body[1] }]))
+        rds.set(body[0], JSON.stringify([body[0], { _id: body[0], ...body[1] }]))
         rds.incr('queue')
         await insertData(body);
-        return [body[0],{ _id: body[0], ...body[1] }]
+        return { data: [body[0], { _id: body[0], ...body[1] }], method: 'POST' }
 
     }
 
