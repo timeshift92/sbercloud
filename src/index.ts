@@ -18,7 +18,7 @@ uWS.App().ws('/*', {
 
   open: (ws) => {
     socketClosed = false;
-    // ws.subscribe('/')
+    ws.subscribe('/')
   },
   message: (ws, message, isBinary) => {
     const response = (new TextDecoder('utf-8')).decode(message)
@@ -26,15 +26,15 @@ uWS.App().ws('/*', {
       const result = applicationController(JSON.parse(response))
       subscriber.on("message", function (channel, message) {
         console.log('broadcast', message)
-        if (!socketClosed) {
-          ws.send( message)
-        }
+        // if (!socketClosed) {
+        //   ws.publish('/', message)
+        // }
       });
 
       result.then(data => {
         if (!socketClosed) {
           console.log(ws.getBufferedAmount())
-          ws.send(JSON.stringify(data))
+          ws.publish('/', JSON.stringify(data) )
         }
       })
       subscriber.subscribe("moldb");

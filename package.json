@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node  index.ts",
+    "start": "ts-node  src/index.ts",
     "build": "tsc  --outDir dist",
     "publish": "npm run build && pm2 restart all"
   },
@@ -14,7 +14,9 @@
   "dependencies": {
     "@types/mongodb": "^3.6.3",
     "@types/redis": "^2.8.28",
+    "dotenv": "^8.2.0",
     "mongodb": "^3.6.3",
+    "mongoose": "^5.11.7",
     "redis": "^3.0.2",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.11.0"
   },
