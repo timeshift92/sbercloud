@@ -1,6 +1,5 @@
 import { MongoClient } from "mongodb";
 import * as redis from "redis";
-import { promisify } from "util";
 const mongoClient = new MongoClient("mongodb://rwuser:T7z-75F-34m-rGC@192.168.0.69:8635,192.168.0.106:8635,192.168.0.214:8635,192.168.0.100:8635,192.168.0.11:8635,192.168.0.216:8635,192.168.0.125:8635,192.168.0.5:8635,192.168.0.114:8635,192.168.0.132:8635/test?authSource=admin", {
     maxPoolSize: 500,
     useNewUrlParser: true,

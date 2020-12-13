@@ -12,7 +12,6 @@ export async function applicationController(body: [string, object | null]) {
     if (body.length <= 1 || (body.length > 1 && body[1] == null)) {
         const mongo: any = await getData(body[0]);
         return { method: "GET", data: mongo || JSON.parse(await getAsync(body[0])) }
-        // return ;
     } else if (body.length > 1) {
         rds.set(body[0], JSON.stringify([body[0], { _id: body[0], ...body[1] }]))
         rds.incr('queue')
